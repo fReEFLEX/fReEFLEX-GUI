@@ -1,5 +1,5 @@
 # fReEFLEX GUI
-[![License: Apache License 2.0](https://img.shields.io/badge/License-Apache%20License%202.0-yellow.svg)](https://github.com/fReEFLEX/fReEFLEX-doc/blob/main/LICENSE)
+[![License: Apache License 2.0](https://img.shields.io/badge/License-Apache%20License%202.0-yellow.svg)](LICENSE)
 
 > HTML based fReEFLEX GUI based on WebHID API.
 
