@@ -10,7 +10,7 @@
 
 ## 📖 Documentation
 
-[fReEFLEX GUI documentation](https://github.com/fReEFLEX/fReEFLEX-doc)
+[fReEFLEX GUI documentation](https://github.com/fReEFLEX/fReEFLEX-doc/blob/main/GUI.md)
 
 ## 📁 Download
 
