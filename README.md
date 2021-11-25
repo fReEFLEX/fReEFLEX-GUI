@@ -6,7 +6,7 @@
 
 > HTML based fReEFLEX GUI based on WebHID API.
 
-![](gui.png?raw=true "GUI")
+![GUI](https://github.com/fReEFLEX/fReEFLEX-doc/blob/main/assets/gui.png?raw=true "GUI")
 
 ## 📖 Documentation
 
@@ -14,7 +14,7 @@
 
 ## 📁 Download
 
-- [online version](https://fReEFLEX.github.io) - no download required
+- [online version](https://freeflex.github.io/fReEFLEX-GUI/) - always latest version
 - [offline package](https://github.com/fReEFLEX/fReEFLEX-GUI/releases)
 
 ## ☕ Support fReEFLEX project
