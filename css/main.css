@@ -1,0 +1,12 @@
+body {
+    background: #082032;
+    font-family: sans-serif;
+}
+
+#plot {
+    user-select: none;
+}
+
+#event-log p {
+    margin-bottom: 0;
+}
