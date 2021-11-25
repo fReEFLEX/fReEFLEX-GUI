@@ -31,7 +31,7 @@
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="mode" id="e2e_latency_stream" value="0">
                     <label class="form-check-label" for="e2e_latency_stream">
-                        E2E Latency + Stream
+                        E2E latency + Stream
                     </label>
                     <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-placement="right"
                        title="Measure end-to-end latency while streaming sensor data. Recommended to dial in light sensitivity."></i>
@@ -39,7 +39,7 @@
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="mode" id="e2e_latency" value="1">
                     <label class="form-check-label" for="e2e_latency">
-                        E2E Latency
+                        E2E latency
                     </label>
                     <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-placement="right"
                        title="Measure end-to-end latency. Consumes less CPU and GPU than streaming mode."></i>
@@ -47,10 +47,10 @@
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="mode" id="system_latency" value="2">
                     <label class="form-check-label" for="system_latency">
-                        System Latency
+                        System latency
                     </label>
                     <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-placement="right"
-                       title="Measure hid round trip time. This only works in combination with auto fire."></i>
+                       title="Measure hid round trip time."></i>
                 </div>
             </div>
         </div>
@@ -91,7 +91,7 @@
                 <div class="d-inline">
                     <label for="click_timeout" class="form-label">click timeout</label>
                     <i class="bi bi-question-circle list-inline-item" data-bs-toggle="tooltip" data-bs-placement="right"
-                       title="How long to wait for a response before timing out. Gets overruled by a shorter auto fire delay."></i>
+                       title="Fixed value for now. How long to wait for a response before timing out. Gets overruled by a shorter auto fire delay."></i>
                 </div>
                 <input type="range" class="form-range" min="50" max="1000" step="1" value="250"
                        id="click_timeout">
