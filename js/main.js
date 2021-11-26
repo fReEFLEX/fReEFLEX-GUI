@@ -610,9 +610,8 @@ class GUI {
     }
 
     updateAFHighlighting() {
-        let mode = $('input[type=radio][name=mode]:checked').val();
         let mouseMode = $('input[type=radio][name=mouse]:checked').val();
-        if (mode === "2" || mouseMode === "1") {
+        if (mouseMode === "1") {
             $('#autofire_delay').parent().addClass("border-3 border-warning").removeClass("p-3").css({"padding": "calc(1rem - 2px)"});
         } else {
             $('#autofire_delay').parent().removeClass("border-3 border-warning").addClass("p-3").css("padding", '');
