@@ -30,6 +30,12 @@ fReEFLEX helps you to
 - Optimize your OS for low input latency: [System latency mode](#5-system-latency-mode)
 - Measure processing delay of mice: [Mouse latency](#51-mouse-latency)
 
+The fReEFLEX project includes
+- [Controller firmware](https://github.com/fReEFLEX/fReEFLEX-controller/releases) - copy this on your Raspberry Pi Pico
+- [GUI](https://github.com/fReEFLEX/fReEFLEX-GUI/) - to operate the controller
+- [3D Application](https://github.com/fReEFLEX/fReEFLEX-clicker/) - 3D application for E2E latency measurement 
+
+
 ## Usage
 >⚠️This GUI requires a recent Version of Chrome, Edge or any other Browser with support for **WebHID API**.
 
@@ -85,7 +91,7 @@ Click on **save CSV** to generate a CSV containing recorded events.
 
 ## Tips
 - Fire at least 100 clicks to get reliable results.
->HID protocol uses a fixed polling rate. At 1000Hz polling rate every click naturally has a 0-1ms latency before being recognized by your system. You want this to average out aswell as other fluctuations happening on your system.
+  >HID protocol uses a fixed polling rate. At 1000Hz polling rate every click naturally has a 0-1ms latency before being recognized by your system. You want this to average out aswell as other fluctuations happening on your system.
 
 - use fast auto fire function in online games at your own risk, it might get you banned! Make use of training modes etc.
 
