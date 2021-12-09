@@ -19,16 +19,18 @@
     - [4. E2E latency mode](#4-e2e-latency-mode)
     - [5. System latency mode](#5-system-latency-mode)
         - [5.1 Mouse latency](#51-mouse-latency)
-    - [6. Saving results](#6-saving-results)
+    - [6. Light frequency](#6-light-frequency)
+    - [7. Saving results](#7-saving-results)
 - [Tips](#tips)
-- [Support the fReEFLEX project](#-support-freeflex-project)
+- [Support fReEFLEX project](#-support-freeflex-project)
 - [License](#-license)
 
-## What is this?
+## What is fReEFLEX?
 fReEFLEX helps you to 
 - Find the best settings for low input latency in 3D Games and debunk or proof common myth about input latency: [E2E latency mode](#4-e2e-latency-mode)
 - Optimize your OS for low input latency: [System latency mode](#5-system-latency-mode)
 - Measure processing delay of mice: [Mouse latency](#51-mouse-latency)
+- Measure the [frequency](#6-light-frequency) of pulsed light sources, e.g. backlight strobing, dimmed LEDs.
 
 
 The fReEFLEX project includes
@@ -53,8 +55,8 @@ To make sure everything works as expected:
 - On an idle system measurements should be around 1.5-3ms. ✔️
 - You can proceed with either
     - integrated click detector - has a bit extra latency as it runs inside a browser 
-    - [fReEFLEX clicker](https://github.com/fReEFLEX/fReEFLEX-clicker) - lowest latency for E2E (fullscreen️❗) and System latency modes
-    - 🎮 FPS games or any other application that produces a bright flash on mouse click like (does not support System latency mode). 
+    - [fReEFLEX clicker](https://github.com/fReEFLEX/fReEFLEX-clicker) - very low latency, adjustable FPS
+    - 🎮 FPS games or any other application that produces a bright flash on mouse click
     
 ![](doc/system_latency.png?raw=true "System latency")
 
@@ -89,21 +91,25 @@ System latency mode can also be used to measure the latency of a real mouse.
 - Measure System latency using a real mouse.
 
 The difference between these two measurements tells you how long it took the mouse to detect a state change of the hardware switch and send a signal to your computer.
-> Given that your mouse also runs at 1000Hz polling rate the difference should not be more than 1-2ms for a gaming mouse.
+>Given that your mouse also runs at 1000Hz polling rate the difference should not be more than 1-2ms for a gaming mouse.
 
-### 6. Saving results
+### 6. Light frequency
+This mode measures the frequency of pulsed light sources like backlight strobing on a monitor or dimmed LED lights.
+>The light sensor runs at 50 kHz, thus the absolute maximum frequency it can measure is 25 kHz.
+
+### 7. Saving results
 Click on **save CSV** to generate a CSV containing recorded events.
-> ⚠️ values in CSV are microseconds 
+>⚠️ values in CSV are microseconds 
 
 ## Tips
 - Fire at least 100 clicks to get reliable results.
   >HID protocol uses a fixed polling rate. At 1000Hz polling rate every click naturally has a 0-1ms latency before being recognized by your system. You want this to average out aswell as other fluctuations happening on your system.
 
-- use fast auto fire function in online games at your own risk, it might get you banned! Make use of training modes etc.
+- Use fast auto fire function in online games at your own risk, it might get you banned! Make use of training modes etc.
 
-- to find the optimal settings for fast paced online games not only optimize for lowest input latency but also for a low fluctuation (std)
+- To find the optimal settings for fast paced online games predictability is important! Do not only optimize for lowest latency but also for low fluctuation (std).
 
-- when measuring with a real mouse
+- When measuring with a real mouse
     - You can run the UI on a different system.
     - If your mouse supports changing polling rate you can observe the effect of that using the [System latency mode](#5-system-latency-mode).
 
