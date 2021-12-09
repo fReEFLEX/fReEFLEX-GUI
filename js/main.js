@@ -47,23 +47,26 @@ class HIDDevice extends EventEmitter {
             usagePage: 0xFF00,
             usage: 0x0001,
         };
-    static report_length = 15;
+    static VERSION_MIN = 2;
+    static VERSION_MAX = 2;
+    static report_length = 14;
     static MAGIC_PACKET = 0x66726565;
     static requestParams = {filters: [HIDDevice.deviceFilter]};
     static outputReportId = 0x03;
+    static serial_baud = 250000;
 
     static report_offsets =
         {
-            MODE: 0,
-            TIMESTAMP: 1,
-            LIGHT_SENSOR: 5,
-            IS_CLICK: 9,
-            KEY: 10,
-            VALUE: 11,
+            TIMESTAMP: 0,
+            KEY: 4,
+            SET: 5,
+            VALUE: 6,
+            VALUE_2: 10,
         };
 
     static report_keys =
         {
+            STREAM: 0,
             MAGIC_PACKET: 1,
             MODE: 2,
             EVENT: 3,
@@ -82,12 +85,13 @@ class HIDDevice extends EventEmitter {
     constructor() {
         super();
         this.device = null;
+        this.serial_device = null;
         this.initialized = false;
 
         this.outputReport = new Uint8Array(HIDDevice.report_length);
 
         //int <-> byte value conversion
-        this.valueBuffer = new ArrayBuffer(4);
+        this.valueBuffer = new ArrayBuffer(8);
         this.valueUint32 = new Uint32Array(this.valueBuffer);
         this.valueUint8 = new Uint8Array(this.valueBuffer);
 
@@ -122,11 +126,11 @@ class HIDDevice extends EventEmitter {
             const devices = await navigator.hid.requestDevice(HIDDevice.requestParams);
             this.device = devices[0];
         } catch (error) {
-            throw("requesting hid device failed");
+            throw(error);
         }
 
         if (!this.device) {
-            throw ("no device was selected");
+            throw ("no hid device was selected");
         } else {
             console.log("found hid device");
         }
@@ -141,19 +145,71 @@ class HIDDevice extends EventEmitter {
         }
     }
 
-    async sendHID(key, value = null) {
+    async requestSerial() {
+        if ("serial" in navigator) {
+
+        } else {
+            alert("Browser does not support WebSerial API. Browsers known to work are latest versions of Chrome and Edge.");
+            return;
+        }
+        //request and initialize HID device
+        try {
+            this.serial_device = await navigator.serial.requestPort([
+                { usbVendorId: HIDDevice.deviceFilter.vendorId, usbProductId: HIDDevice.deviceFilter.productId }
+            ]);
+        } catch (error) {
+            throw(error);
+        }
+
+        if (!this.serial_device) {
+            throw ("no serial device was selected");
+        }
+        try {
+            await this.initializeSerial();
+        } catch (e) {
+            throw (e);
+        }
+    }
+
+    async initializeSerial() {
+        if (this.serial_device) {
+            await this.serial_device.open({ baudRate: HIDDevice.serial_baud });
+        }
+    }
+
+    closeSerial() {
+        if (this.serial_device) {
+            this.serial_device.close().then(() => this.serial_device = null);
+        }
+        this.serial_device = null;
+    }
+
+    closeHid() {
+        if (this.device) {
+            this.device.close().then(() => this.device = null);
+        }
+        this.device = null;
+    }
+
+    async sendHID(key, value = null, value_2 = null) {
         if (!this.initialized && key !== HIDDevice.report_keys.MAGIC_PACKET) {
             return;
         }
         this.outputReport[HIDDevice.report_offsets.KEY] = key;
         if (value !== null) {
-            this.outputReport[HIDDevice.report_offsets.MODE] = 0x01;
+            this.outputReport[HIDDevice.report_offsets.SET] = 0x01;
             this.valueUint32[0] = value;
+            this.valueUint32[1] = value_2 !== null ? value_2 : 0;
             this.outputReport.set(this.valueUint8, HIDDevice.report_offsets.VALUE);
         } else {
-            this.outputReport[HIDDevice.report_offsets.MODE] = 0x00;
+            this.outputReport[HIDDevice.report_offsets.SET] = 0x00;
         }
         await this.device.sendReport(HIDDevice.outputReportId, this.outputReport);
+    }
+
+    extractUint32(report, offset) {
+        this.valueUint8.set(report.subarray(offset, offset + 4));
+        return this.valueUint32[0];
     }
 
     processReport(report) {
@@ -163,31 +219,32 @@ class HIDDevice extends EventEmitter {
             return;
         }
 
-        let mode = report[0];
-        this.valueUint8.set(report.subarray(HIDDevice.report_offsets.TIMESTAMP, HIDDevice.report_offsets.TIMESTAMP + 4));
-        let timestamp = this.valueUint32[0];
-        this.valueUint8.set(report.subarray(HIDDevice.report_offsets.LIGHT_SENSOR, HIDDevice.report_offsets.LIGHT_SENSOR + 4));
-        let light_sensor = this.valueUint32[0];
-        let is_click = !!report[HIDDevice.report_offsets.IS_CLICK];
-        this.valueUint8.set(report.subarray(HIDDevice.report_offsets.VALUE, HIDDevice.report_offsets.VALUE + 4));
-        let value = this.valueUint32[0];
-        //console.log(`received report:\nmode: ${mode}\ntimestamp: ${timestamp}\nlight_sensor: ${light_sensor}\nis_click: ${!!is_click}`);
+        //let timestamp = this.extractUint32(report, HIDDevice.report_offsets.TIMESTAMP, 4);
+        //let set = report[HIDDevice.report_offsets.SET];
+        let value = this.extractUint32(report, HIDDevice.report_offsets.VALUE);
+        let value_2 = this.extractUint32(report, HIDDevice.report_offsets.VALUE_2);
+        //console.log(`received report:\ntimestamp: ${timestamp}\nkey: ${key}\nset: ${set}\nvalue: ${value}`);
 
         if (key === 0) {
-            if (is_click !== this.is_click_last) {
-                this.emit("is_click", is_click);
-                this.is_click_last = is_click;
+            if (!!value_2 !== this.is_click_last) {
+                this.emit("is_click", !!value_2);
+                this.is_click_last = !!value_2;
             }
-            this.emit("light_sensor", light_sensor);
+            this.emit("light_sensor", value);
             return;
         }
 
-        //console.log("received report: " + report);
+        //console.log(`received report:\ntimestamp: ${timestamp}\nkey: ${key}\nset: ${set}\nvalue: ${value}\nvalue_2: ${value_2}`);
 
         switch (key) {
             case HIDDevice.report_keys.MAGIC_PACKET:
                 if (!this.initialized && value === HIDDevice.MAGIC_PACKET) {
-                    console.log("received MAGIC PACKET");
+                    console.log("received MAGIC PACKET, version " + value_2);
+                    if (value_2 < HIDDevice.VERSION_MIN || value_2 > HIDDevice.VERSION_MAX) {
+                        console.log("controller version incompatible, please update.");
+                        alert("controller version incompatible!");
+                        break;
+                    }
                     this.initialized = true;
                     this.emit("initialized", true);
                     this.requestSettings().then(() => console.log("requested settings"));
@@ -264,10 +321,22 @@ class HIDDevice extends EventEmitter {
         console.log("Device disconnected: " + e.device.productName);
         this.emit("initialized", false);
         this.initialized = false;
-        if (this.device)
-            this.device.close().then(() => this.device = null);
-        else
-            this.device = null;
+        this.closeSerial();
+        this.closeHid();
+    }
+
+    sendClickReceived() {
+        if (this.serial_device) {
+            try {
+                const writer = this.serial_device.writable.getWriter();
+                const data = new Uint8Array([0]);
+                writer.write(data).then( () => writer.releaseLock());
+            } catch (e) {
+                console.log(e);
+            }
+        } else {
+            this.sendHID(HIDDevice.report_keys.CLICK_RECEIVED, 1).then();
+        }
     }
 
     //getters & setters
@@ -340,6 +409,10 @@ class GUI {
             sum: 0,
             mean: 0,
         }
+        this.detector = {
+            low: "#000000",
+            high: "#ffffff",
+        }
 
         this.enableTooltips();
 
@@ -359,6 +432,14 @@ class GUI {
             this.freeflexDevice.start();
         });
 
+        //connect serial button
+        $("#connect_serial_button").on("click", () => {
+            this.freeflexDevice.requestSerial().then(() => {
+                console.log("connected to serial port");
+                $("#connect_serial_button").prop("disabled", true).addClass("btn-success");
+            }).catch((e) => console.log(e));
+        });
+
         //device init
         this.freeflexDevice.on("initialized", (isInitialized) => {
             if (isInitialized) {
@@ -367,6 +448,7 @@ class GUI {
                 $("#autofire_button").prop("disabled", false);
             } else {
                 $("#connect_button").removeClass("btn-primary btn-success").addClass("btn-primary").prop("disabled", false).text("connect");
+                $("#connect_serial_button").removeClass("btn-success");
                 this.enableAfterAF();
                 this.disableAllSettings();
             }
@@ -377,10 +459,15 @@ class GUI {
             $('input[type=radio][name=mode]').prop("checked", false).prop("disabled", false);
             if (mode === 0) {
                 $('input[type=radio][id=e2e_latency_stream]').prop("checked", true);
+                $('#connect_serial_button').prop("disabled", true).removeClass("btn-success");
+                this.freeflexDevice.closeSerial();
             } else if (mode === 1) {
                 $('input[type=radio][id=e2e_latency]').prop("checked", true);
+                $('#connect_serial_button').prop("disabled", true).removeClass("btn-success");
+                this.freeflexDevice.closeSerial();
             } else if (mode === 2) {
                 $('input[type=radio][id=system_latency]').prop("checked", true);
+                $('#connect_serial_button').prop("disabled", false).removeClass("btn-success");
             } else {
                 alert("invalid mode!");
             }
@@ -491,10 +578,10 @@ class GUI {
             setTimeout(() => {
                 this.freeflexDevice.autofire_remaining = autofire_progress.attr('aria-valuemax');
             }, start_in * 1000);
-            autofire_progress.css('width', start_in/5 * 100 + '%').addClass("bg-danger").children().text(start_in);
+            autofire_progress.css('width', start_in / 5 * 100 + '%').addClass("bg-danger").children().text(start_in);
             let countdown = setInterval(() => {
                 start_in--;
-                autofire_progress.css('width', start_in/5 * 100 + '%').children().text(start_in);
+                autofire_progress.css('width', start_in / 5 * 100 + '%').children().text(start_in);
                 if (start_in === 0) {
                     autofire_progress.attr('aria-valuenow', 0).css('width', 0 + '%').removeClass("bg-danger").children().text('');
                     clearInterval(countdown);
@@ -523,19 +610,19 @@ class GUI {
             click_detector.off();
             if (mode === 2) {
                 click_detector.on("mousedown", () => {
-                    this.freeflexDevice.sendHID(HIDDevice.report_keys.CLICK_RECEIVED, 1).then();
+                    this.freeflexDevice.sendClickReceived();
                 });
             } else {
                 click_detector.on("mousedown", () => {
-                    detector_ctx.fillStyle = 'white';
+                    detector_ctx.fillStyle = this.detector.high;
                     detector_ctx.fillRect(0, 0, detector_canvas.width, detector_canvas.height);
                 });
                 click_detector.on("mouseup", () => {
-                    detector_ctx.fillStyle = 'black';
+                    detector_ctx.fillStyle = this.detector.low;
                     detector_ctx.fillRect(0, 0, detector_canvas.width, detector_canvas.height);
                 });
                 click_detector.on("mouseleave", () => {
-                    detector_ctx.fillStyle = 'black';
+                    detector_ctx.fillStyle = this.detector.low;
                     detector_ctx.fillRect(0, 0, detector_canvas.width, detector_canvas.height);
                 });
             }
@@ -560,7 +647,7 @@ class GUI {
         });
 
         //on timeout
-        this.freeflexDevice.on("timeout", (us) => {
+        this.freeflexDevice.on("timeout", () => {
             this.stats.timeouts++;
             this.updateStats();
         });
@@ -652,8 +739,8 @@ class GUI {
     }
 
     disableAllSettings() {
-        $("input:not(#filter_min, #filter_max)").prop("disabled", true);
-        $("button:not(#connect_button, #reset_button, #save_button)").prop("disabled", true);
+        $(".container input:not(#filter_min, #filter_max)").prop("disabled", true);
+        $(".container button:not(#connect_button, #reset_button, #save_button)").prop("disabled", true);
     }
 
     disableWhileAF() {
