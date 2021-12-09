@@ -234,7 +234,7 @@ class HIDDevice extends EventEmitter {
             return;
         }
 
-        //console.log(`received report:\ntimestamp: ${timestamp}\nkey: ${key}\nset: ${set}\nvalue: ${value}\nvalue_2: ${value_2}`);
+        console.log(`received report:\ntimestamp: ${this.extractUint32(report, HIDDevice.report_offsets.TIMESTAMP, 4)}\nkey: ${key}\nset: ${report[HIDDevice.report_offsets.SET]}\nvalue: ${value}\nvalue_2: ${value_2}`);
 
         switch (key) {
             case HIDDevice.report_keys.MAGIC_PACKET:
@@ -455,19 +455,22 @@ class GUI {
         })
 
         //mode
+        let serial_button = $('#connect_serial_button');
         this.freeflexDevice.on("mode", (mode) => {
             $('input[type=radio][name=mode]').prop("checked", false).prop("disabled", false);
+            serial_button.prop("disabled", true).removeClass("btn-success");
+
             if (mode === 0) {
                 $('input[type=radio][id=e2e_latency_stream]').prop("checked", true);
-                $('#connect_serial_button').prop("disabled", true).removeClass("btn-success");
                 this.freeflexDevice.closeSerial();
             } else if (mode === 1) {
                 $('input[type=radio][id=e2e_latency]').prop("checked", true);
-                $('#connect_serial_button').prop("disabled", true).removeClass("btn-success");
                 this.freeflexDevice.closeSerial();
             } else if (mode === 2) {
                 $('input[type=radio][id=system_latency]').prop("checked", true);
-                $('#connect_serial_button').prop("disabled", false).removeClass("btn-success");
+                serial_button.prop("disabled", false).removeClass("btn-success");
+            } else if (mode === 4) {
+                $('input[type=radio][id=light_frequency]').prop("checked", true);
             } else {
                 alert("invalid mode!");
             }
@@ -633,7 +636,8 @@ class GUI {
         //on event
         let event_log = $("#event-log");
         this.freeflexDevice.on("event", (us) => {
-            event_log.prepend("<p>" + (us / 1000).toFixed(2) + "ms</p>");
+            if (this.freeflexDevice.mode === 4) event_log.prepend("<p>" + (us).toFixed(0) + "Hz</p>");
+            else event_log.prepend("<p>" + (us / 1000).toFixed(2) + "ms</p>");
             if (!this.filterEvent(us)) {
                 this.stats.events.push(us);
                 this.stats.min = this.stats.min ? Math.min(us, this.stats.min) : us;
