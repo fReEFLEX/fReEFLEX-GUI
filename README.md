@@ -11,7 +11,7 @@
 
 ## Contents
 - [Download](#-download)
-- [What is this?](#what-is-this)
+- [What is this?](#what-is-freeflex)
 - [Usage](#usage)
     - [1. Get started](#1-get-started)
     - [2. Functionality test](#2-functionality-test)
