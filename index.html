@@ -50,7 +50,8 @@
                         System latency
                     </label>
                     <i class="bi bi-question-circle" data-bs-toggle="tooltip" data-bs-placement="right"
-                       title="Measure hid round trip time."></i>
+                       title="Measure system latency, connect serial port to eliminate polling rate when responding to clicks."></i>
+                    <button id="connect_serial_button" type="button" class="btn btn-primary btn-sm">serial</button>
                 </div>
             </div>
         </div>
@@ -91,7 +92,7 @@
                 <div class="d-inline">
                     <label for="click_timeout" class="form-label">click timeout</label>
                     <i class="bi bi-question-circle list-inline-item" data-bs-toggle="tooltip" data-bs-placement="right"
-                       title="Fixed value for now. How long to wait for a response before timing out. Gets overruled by a shorter auto fire delay."></i>
+                       title="(fixed value) How long to wait for a response before timing out."></i>
                 </div>
                 <input type="range" class="form-range" min="50" max="1000" step="1" value="250"
                        id="click_timeout">
@@ -215,15 +216,16 @@
         </div>
     </div>
 </div>
-<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
         crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/gh/danchitnis/webgl-plot@master/dist/webglplot.umd.min.js"></script>-->
-<script src="vendor/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/danchitnis/webgl-plot@master/dist/webglplot.umd.min.js"></script>
+<!--<script src="vendor/bootstrap.bundle.min.js"></script>
 <script src="vendor/jquery.min.js"></script>
-<script src="vendor/webglplot.umd.min.js"></script>
+<script src="vendor/webglplot.umd.min.js"></script>-->
 <script src="js/main.js"></script>
 <script>
     window.onload = function () {

@@ -30,6 +30,7 @@ fReEFLEX helps you to
 - Optimize your OS for low input latency: [System latency mode](#5-system-latency-mode)
 - Measure processing delay of mice: [Mouse latency](#51-mouse-latency)
 
+
 The fReEFLEX project includes
 - [Controller firmware](https://github.com/fReEFLEX/fReEFLEX-controller/releases) - copy this on your Raspberry Pi Pico
 - [GUI](https://github.com/fReEFLEX/fReEFLEX-GUI/) - to operate the controller
@@ -61,7 +62,7 @@ To make sure everything works as expected:
 This mode plots live sensor data coming from the light sensor aswell as mouse clicks. 
 
 - Light sensitivity line should be above light sensor readings when not clicking but below when firing.
-- measures **click-to-photon latency**: mouse click ➡️ software ➡️ screen flashes ➡️ fReEFLEX controller
+- Measures **click-to-photon latency**: mouse click ➡️ software ➡️ screen flashes ➡️ fReEFLEX controller
 
 >When the click detection works reliably you should switch to [E2E latency mode](#4-e2e-latency-mode).   
 
@@ -69,12 +70,17 @@ This mode plots live sensor data coming from the light sensor aswell as mouse cl
 This mode works the same as [Streaming mode](#3-streaming-mode) while not rendering any live data to save resources on your system.  
 
 ### 5. System latency mode
-In this mode instead of reading data from the light sensor a hid message is sent to the [fReEFLEX controller](https://github.com/fReEFLEX/fReEFLEX-controller) when a click was detected.
-This works with both the integrated click detector and [fReEFLEX clicker](https://github.com/fReEFLEX/fReEFLEX-clicker) which should be preferred.
+In this mode instead of reading data from a light sensor a message is sent directly to the [fReEFLEX controller](https://github.com/fReEFLEX/fReEFLEX-controller) when a click was detected.
+This works with both the integrated click detector and [fReEFLEX clicker](https://github.com/fReEFLEX/fReEFLEX-clicker).
 
-- measures **click-to-software latency**: mouse click ➡️ software ➡️ fReEFLEX controller
+- Integrated click detector has a bit extra latency as it runs inside a browser. Will fall back to hid when not connected to serial port.
+- Measures **click-to-software latency**: mouse click ➡️ software ➡️ fReEFLEX controller
+- With enough measurements taken: 
+    - ```mininum latency = min``` 
+    - ```average latency = mean - 500/(polling rate)```
+    - most likely ```mininum latency ≈ average latency``` 
 
->This basically is a HID round trip measurement at 1000hz polling rate plus the time it takes the software to detect a click and send a response.
+>At 1000Hz polling rate there is a 0-1ms delay (≃0.5ms) before your OS is able to receive a mouse click. Serial port latency should be insignificant. 
 
 #### 5.1 Mouse latency
 System latency mode can also be used to measure the latency of a real mouse. 
@@ -82,7 +88,7 @@ System latency mode can also be used to measure the latency of a real mouse.
 - Measure System latency using emulated mouse.
 - Measure System latency using a real mouse.
 
-The difference between the two measurements tells you how long it took the mouse to detect a state change of the hardware switch and send a signal to your computer.
+The difference between these two measurements tells you how long it took the mouse to detect a state change of the hardware switch and send a signal to your computer.
 > Given that your mouse also runs at 1000Hz polling rate the difference should not be more than 1-2ms for a gaming mouse.
 
 ### 6. Saving results
