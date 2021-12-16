@@ -11,7 +11,7 @@
 
 ## Contents
 - [Download](#-download)
-- [What is this?](#what-is-freeflex)
+- [What is fReEFLEX?](#what-is-freeflex)
 - [Usage](#usage)
     - [1. Get started](#1-get-started)
     - [2. Functionality test](#2-functionality-test)
@@ -52,7 +52,7 @@ The fReEFLEX project includes
 To make sure everything works as expected:
 - Change **Mode** to System latency and **Mouse** to emulated.
 - Press **FIRE** and move your mouse cursor over the click detector (black) below the button.
-- On an idle system measurements should be around 1.5-3ms. ✔️
+- On an idle system measurements should be around 1.5-3ms (0.5-2.5ms with serial). ✔️
 - You can proceed with either
     - integrated click detector - has a bit extra latency as it runs inside a browser 
     - [fReEFLEX clicker](https://github.com/fReEFLEX/fReEFLEX-clicker) - very low latency, adjustable FPS
@@ -75,7 +75,7 @@ This mode works the same as [Streaming mode](#3-streaming-mode) while not render
 In this mode instead of reading data from a light sensor a message is sent directly to the [fReEFLEX controller](https://github.com/fReEFLEX/fReEFLEX-controller) when a click was detected.
 This works with both the integrated click detector and [fReEFLEX clicker](https://github.com/fReEFLEX/fReEFLEX-clicker).
 
-- Integrated click detector has a bit extra latency as it runs inside a browser. Will fall back to hid when not connected to serial port.
+- Integrated click detector has a bit extra latency as it runs inside a browser. Will fall back to hid reporting when not connected to serial port.
 - Measures **click-to-software latency**: mouse click ➡️ software ➡️ fReEFLEX controller
 - With enough measurements taken: 
     - ```mininum latency = min``` 
