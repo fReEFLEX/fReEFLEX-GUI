@@ -234,7 +234,7 @@ class HIDDevice extends EventEmitter {
             return;
         }
 
-        console.log(`received report:\ntimestamp: ${this.extractUint32(report, HIDDevice.report_offsets.TIMESTAMP, 4)}\nkey: ${key}\nset: ${report[HIDDevice.report_offsets.SET]}\nvalue: ${value}\nvalue_2: ${value_2}`);
+        //console.log(`received report:\ntimestamp: ${this.extractUint32(report, HIDDevice.report_offsets.TIMESTAMP, 4)}\nkey: ${key}\nset: ${report[HIDDevice.report_offsets.SET]}\nvalue: ${value}\nvalue_2: ${value_2}`);
 
         switch (key) {
             case HIDDevice.report_keys.MAGIC_PACKET:
